@@ -1,0 +1,67 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Application {
+  applicationTags     ApplicationTag[]
+  applicationVersions ApplicationVersion[]
+  createdAt           DateTime               @default(now())
+  id                  String                 @id @default(cuid())
+  name                String?
+  pages               Page[]
+  screenshot          Json?
+  status              EnumApplicationStatus?
+  updatedAt           DateTime               @updatedAt
+}
+
+model ApplicationTag {
+  application   Application? @relation(fields: [applicationId], references: [id])
+  applicationId String?
+  createdAt     DateTime     @default(now())
+  id            String       @id @default(cuid())
+  name          String?
+  updatedAt     DateTime     @updatedAt
+}
+
+model Page {
+  application   Application?  @relation(fields: [applicationId], references: [id])
+  applicationId String?
+  createdAt     DateTime      @default(now())
+  id            String        @id @default(cuid())
+  name          String?
+  pageSchema    String?
+  pageVersions  PageVersion[]
+  updatedAt     DateTime      @updatedAt
+}
+
+model PageVersion {
+  applicationVersion   ApplicationVersion? @relation(fields: [applicationVersionId], references: [id])
+  applicationVersionId String?
+  createdAt            DateTime            @default(now())
+  id                   String              @id @default(cuid())
+  page                 Page?               @relation(fields: [pageId], references: [id])
+  pageId               String?
+  updatedAt            DateTime            @updatedAt
+  versionSchema        String?
+}
+
+model ApplicationVersion {
+  application        Application?  @relation(fields: [applicationId], references: [id])
+  applicationId      String?
+  createdAt          DateTime      @default(now())
+  id                 String        @id @default(cuid())
+  pageVersions       PageVersion[]
+  releaseDate        DateTime?
+  updatedAt          DateTime      @updatedAt
+  versionDescription String?
+  versionName        String?
+}
+
+enum EnumApplicationStatus {
+  Option1
+}
